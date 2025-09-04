@@ -1,0 +1,17 @@
+﻿black
+jupyter-black
+pylint
+scikit-learn
+pandas
+numpy
+matplotlib
+seaborn
+ipykernel
+notebook
+fastapi
+uvicorn
+streamlit
+tensorflow
+keras
+scipy
+nltk

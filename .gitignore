@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python/
+env/
+venv/
+.venv/
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+.mypy_cache/
+.vscode/
+
+# Conda
+.conda/
+.condarc
+.DS_Store # macOS specific
+
+# Data
+data/raw/
+data/processed/
+*.csv
+*.json
+*.parquet
+*.pkl
+*.hdf5
+
+# Models
+models/
+*.pt
+*.pth
+*.h5
+*.onnx
+*.joblib
+*.pickle
+*.keras # For Keras models
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Jupyter Notebook specific
+.ipynb_checkpoints/
