@@ -11,7 +11,10 @@ notebook
 fastapi
 uvicorn
 streamlit
-tensorflow
-keras
 scipy
 nltk
+textblob
+vaderSentiment
+langdetect
+torch # This will install the CPU version by default
+gunicorn

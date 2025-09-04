@@ -1,0 +1,59 @@
+{
+    "final_test_accuracy": 0.9,
+    "final_test_f1_weighted": 0.8888392857142857,
+    "final_test_f1_macro": 0.6048085901027077,
+    "train_losses": [
+        0.6136128067970276,
+        0.2658301182091236,
+        0.13895845487713815,
+        0.07972792275249958,
+        0.04286051020026207
+    ],
+    "val_losses": [
+        0.39295225143432616,
+        0.3618031024932861,
+        0.32694616317749026,
+        0.35315054655075073,
+        0.3486455321311951
+    ],
+    "val_accuracies": [
+        90.0,
+        90.0,
+        88.75,
+        86.25,
+        88.75
+    ],
+    "model_path": "models/best_cnn_model.pth",
+    "vocab_path": "models/vocabulary.pkl",
+    "label_map_path": "models/label_map.json",
+    "train_config": {
+        "data_url": "https://storage.googleapis.com/sachin_data1/_Social%20Media%20Analytics%20-%20LLM%20-%20Socila%20Media%20Analytics.csv",
+        "local_raw_data_path": "data/raw/social_media_data.csv",
+        "processed_data_path": "data/processed/processed_social_media_data.csv",
+        "test_size": 0.2,
+        "val_size": 0.5,
+        "random_state": 42,
+        "num_epochs": 5,
+        "batch_size": 64,
+        "patience": 2,
+        "model_save_path": "models/best_cnn_model.pth",
+        "vocab_save_path": "models/vocabulary.pkl",
+        "label_map_save_path": "models/label_map.json",
+        "results_save_path": "models/training_results.json"
+    },
+    "sentiment_config": {
+        "min_freq": 2,
+        "max_vocab_size": 10000,
+        "max_seq_length": 13,
+        "embed_dim": 128,
+        "num_filters": 100,
+        "filter_sizes": [
+            3,
+            4,
+            5
+        ],
+        "dropout": 0.3,
+        "lr": 0.001,
+        "num_classes": 3
+    }
+}
