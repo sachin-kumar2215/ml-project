@@ -9,6 +9,7 @@ import sys
 from src.data.processor import download_and_load_data, combine_comments, DataPreprocessor, extract_and_process_comments, create_ensemble_sentiment, save_processed_data
 from src.models.trainer import train_pipeline, TrainConfig, SentimentConfig
 from src.models.inference import load_sentiment_artifacts, predict_sentiment, InferenceConfig
+from src.visualization import eda_util # NEW IMPORT
 
 def main():
     parser = argparse.ArgumentParser(description="ML Pipeline for Social Media Analytics.")
@@ -43,6 +44,19 @@ def main():
     parser.add_argument("--predict_sentiment", action="store_true",
                         help="Flag to perform sentiment prediction.")
 
+    # --- Visualization Arguments (NEW) ---
+    parser.add_argument("--plot_eda", action="store_true",
+                        help="Generate and display initial EDA plots.")
+    parser.add_argument("--plot_preprocessing", action="store_true",
+                        help="Generate and display preprocessing insights plots.")
+    parser.add_argument("--plot_data_split", action="store_true",
+                        help="Generate and display data split verification plots (only in train mode).")
+    parser.add_argument("--plot_training_curves", action="store_true",
+                        help="Generate and display training loss/accuracy curves (only in train mode).")
+    parser.add_argument("--plot_confusion_matrix", action="store_true",
+                        help="Generate and display confusion matrix (only in train mode).")
+
+
     args = parser.parse_args()
 
     # Ensure necessary directories exist
@@ -59,6 +73,15 @@ def main():
             df_raw = pd.read_csv(args.data_path)
             print(f"Loaded data from local path: {args.data_path}")
 
+        # Add 'total_comments' for initial EDA plot if not already present (NEW)
+        comment_cols_for_eda = [f'Comment {i}' for i in range(1, 11)]
+        existing_comment_cols_for_eda = [col for col in comment_cols_for_eda if col in df_raw.columns]
+        df_raw['total_comments'] = df_raw[existing_comment_cols_for_eda].notna().sum(axis=1)
+
+        if args.plot_eda: # NEW
+            eda_util.plot_initial_data_distributions(df_raw)
+
+
         # Combine comments and extract/process them
         df_combined = combine_comments(df_raw.copy())
         preprocessor = DataPreprocessor()
@@ -69,6 +92,10 @@ def main():
         english_comments = comment_df[comment_df['language'] == 'en'].copy()
         english_comments['final_sentiment'] = english_comments.apply(create_ensemble_sentiment, axis=1)
         print(f"Filtered to {len(english_comments)} English comments for pipeline.")
+
+        if args.plot_preprocessing: # NEW
+            eda_util.plot_preprocessing_insights(comment_df, english_comments)
+
 
         # Ensure 'Post_ID' exists for consistency, especially if original data doesn't have it
         if 'Post_ID' not in english_comments.columns:
@@ -97,13 +124,40 @@ def main():
                 # model instantiation, training, and saving artifacts.
                 training_summary = train_pipeline(train_config, sentiment_config)
 
+                # Extract data for plotting from training_summary (NEW)
+                X_train_for_plot = training_summary['X_train_cleaned_comments']
+                y_train_for_plot = training_summary['y_train_sentiment']
+                X_val_for_plot = training_summary['X_val_cleaned_comments']
+                y_val_for_plot = training_summary['y_val_sentiment']
+                X_test_for_plot = training_summary['X_test_cleaned_comments']
+                y_test_for_plot = training_summary['y_test_sentiment']
+                label_map_for_plot = training_summary['label_map']
+
+
                 print("\nSentiment Model Training Complete.")
                 print(f"Model saved to: {training_summary['model_path']}")
                 print(f"Vocabulary saved to: {training_summary['vocab_path']}")
                 print(f"Label Map saved to: {training_summary['label_map_path']}")
-                # The line below was removed to fix the KeyError, as train_pipeline already saves and prints this.
-                # print(f"Training results saved to: {training_summary['results_save_path']}")
                 print(f"Final Test Accuracy: {training_summary['final_test_accuracy']:.4f}")
+
+                # Plotting after training (NEW)
+                if args.plot_data_split:
+                    eda_util.plot_data_split_verification(y_train_for_plot, y_val_for_plot, y_test_for_plot)
+
+                if args.plot_training_curves:
+                    eda_util.plot_training_curves(
+                        training_summary['train_losses'],
+                        training_summary['val_losses'],
+                        training_summary['val_accuracies']
+                    )
+
+                if args.plot_confusion_matrix:
+                    eda_util.plot_confusion_matrix(
+                        training_summary['labels'], # True labels from test set
+                        training_summary['predictions'], # Predicted labels from test set
+                        label_map_for_plot,
+                        title='CNN Test Set Confusion Matrix'
+                    )
 
             else:
                 print("No specific training task specified. Use --train_sentiment.")
