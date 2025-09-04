@@ -101,7 +101,8 @@ def main():
                 print(f"Model saved to: {training_summary['model_path']}")
                 print(f"Vocabulary saved to: {training_summary['vocab_path']}")
                 print(f"Label Map saved to: {training_summary['label_map_path']}")
-                print(f"Training results saved to: {training_summary['results_save_path']}")
+                # The line below was removed to fix the KeyError, as train_pipeline already saves and prints this.
+                # print(f"Training results saved to: {training_summary['results_save_path']}")
                 print(f"Final Test Accuracy: {training_summary['final_test_accuracy']:.4f}")
 
             else:
